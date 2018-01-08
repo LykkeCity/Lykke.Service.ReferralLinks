@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using AzureStorage;
-using Lykke.blue.Service.ReferralLinks.AzureRepositories.DTOs;
 using Lykke.blue.Service.ReferralLinks.Core.Domain.ReferralLink;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lykke.blue.Service.ReferralLinks.AzureRepositories.ReferralLink
@@ -12,6 +12,7 @@ namespace Lykke.blue.Service.ReferralLinks.AzureRepositories.ReferralLink
     public class ReferralLinkClaimsRepository : IReferralLinkClaimsRepository
     {
         private readonly INoSQLTableStorage<ReferralLinkClaimEntity> _referralLinkClaimsTable;
+        private static readonly SemaphoreSlim SemaphoreSlim = new SemaphoreSlim(1, 1);
 
         public ReferralLinkClaimsRepository(INoSQLTableStorage<ReferralLinkClaimEntity> referralLinkClaimsTable)
         {
@@ -34,7 +35,7 @@ namespace Lykke.blue.Service.ReferralLinks.AzureRepositories.ReferralLink
 
             await _referralLinkClaimsTable.InsertAsync(entity);
 
-            return Mapper.Map<ReferralLinkClaimsDto>(entity);
+            return entity;
         }
 
         public async Task<IEnumerable<IReferralLinkClaim>> GetClaimsForRefLinks(IEnumerable<string> refLinkIds)
@@ -52,7 +53,7 @@ namespace Lykke.blue.Service.ReferralLinks.AzureRepositories.ReferralLink
                 return x;
             });
 
-            return Mapper.Map<ReferralLinkClaimsDto>(result);
+            return result;
         }
     }
 }

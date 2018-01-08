@@ -3,6 +3,7 @@
 // regenerated.
 
 // ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
 {
     using Microsoft.Rest;
@@ -14,7 +15,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
 
     /// <summary>
     /// </summary>
-    public partial interface ILykkeReferralLinksService : System.IDisposable
+    public partial interface ILykkeBlueServiceReferralLinks : System.IDisposable
     {
         /// <summary>
         /// The base URI of the service.
@@ -69,7 +70,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<object>> TransferToLykkeHotWalletWithHttpMessagesAsync(TransferToLykkeWallet model = default(TransferToLykkeWallet), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<object>> TransferToLykkeHotWalletWithHttpMessagesAsync(OffchainTransferToLykkeModel model = default(OffchainTransferToLykkeModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Process offchain channel
@@ -112,6 +113,20 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
         Task<HttpOperationResponse<object>> GetReferralLinkByIdWithHttpMessagesAsync(string id, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
+        /// Get mass generated referral link by id.
+        /// </summary>
+        /// <param name='senderId'>
+        /// The Id of the referral link group
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<object>> GetGroupReferralLinkBySenderIdWithHttpMessagesAsync(string senderId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
         /// Get referral link by url.
         /// </summary>
         /// <param name='url'>
@@ -150,7 +165,20 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<object>> RequestGiftCoinsReferralLinkWithHttpMessagesAsync(GiftCoinsReferralLinkRequest request = default(GiftCoinsReferralLinkRequest), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<object>> RequestGiftCoinsReferralLinkWithHttpMessagesAsync(GiftCoinRequestGroup request = default(GiftCoinRequestGroup), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Generate Gift Coins referral link
+        /// </summary>
+        /// <param name='request'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<object>> RequestGiftCoinsReferralLink1WithHttpMessagesAsync(GiftCoinRequest request = default(GiftCoinRequest), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Request invitation referral link.

@@ -12,25 +12,25 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient.Models
     using Newtonsoft.Json;
     using System.Linq;
 
-    public partial class OffchainGetChannelKeyRequest
+    public partial class OffchainTransferToLykkeModel
     {
         /// <summary>
-        /// Initializes a new instance of the OffchainGetChannelKeyRequest
+        /// Initializes a new instance of the OffchainTransferToLykkeModel
         /// class.
         /// </summary>
-        public OffchainGetChannelKeyRequest()
+        public OffchainTransferToLykkeModel()
         {
           CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the OffchainGetChannelKeyRequest
+        /// Initializes a new instance of the OffchainTransferToLykkeModel
         /// class.
         /// </summary>
-        public OffchainGetChannelKeyRequest(string asset = default(string), string clientId = default(string))
+        public OffchainTransferToLykkeModel(string referralLinkId = default(string), string prevTempPrivateKey = default(string))
         {
-            Asset = asset;
-            ClientId = clientId;
+            ReferralLinkId = referralLinkId;
+            PrevTempPrivateKey = prevTempPrivateKey;
             CustomInit();
         }
 
@@ -41,13 +41,13 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "Asset")]
-        public string Asset { get; set; }
+        [JsonProperty(PropertyName = "ReferralLinkId")]
+        public string ReferralLinkId { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "ClientId")]
-        public string ClientId { get; set; }
+        [JsonProperty(PropertyName = "PrevTempPrivateKey")]
+        public string PrevTempPrivateKey { get; set; }
 
     }
 }

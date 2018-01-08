@@ -7,17 +7,22 @@ using Lykke.blue.Service.ReferralLinks.Core.Domain.ReferralLink;
 using Lykke.blue.Service.ReferralLinks.Core.Kyc;
 using Lykke.blue.Service.ReferralLinks.Core.Services;
 using Lykke.blue.Service.ReferralLinks.Core.Settings;
+using Lykke.blue.Service.ReferralLinks.Models;
 using Lykke.blue.Service.ReferralLinks.Models.Offchain;
 using Lykke.Service.ExchangeOperations.Client;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+
+//OffchainService and all offchain functionality will be removed in next PR. No need to review.
 
 namespace Lykke.blue.Service.ReferralLinks.Controllers
 {
-    //[Route("api/transfers")] //--reserved for version 2
-    public class TransfersController : RefLinksBaseController
+    [Route("api/offchain")] 
+    public class OffchainController : RefLinksBaseController
     {
         private readonly ISrvKycForAsset _srvKycForAsset;
         private readonly IClientSettingsRepository _clientSettingsRepository;
@@ -30,7 +35,7 @@ namespace Lykke.blue.Service.ReferralLinks.Controllers
         private readonly IReferralLinksService _referralLinksService;
         private readonly CachedDataDictionary<string, Lykke.Service.Assets.Client.Models.Asset> _assets;
 
-        public TransfersController(ISrvKycForAsset srvKycForAsset,
+        public OffchainController(ISrvKycForAsset srvKycForAsset,
             IClientSettingsRepository clientSettingsRepository,
             IOffchainService offchainService,
             AppSettings settings,
@@ -54,26 +59,23 @@ namespace Lykke.blue.Service.ReferralLinks.Controllers
             _assets = assets;
         }
 
-        private async Task CheckOffchain(string clientId)
+        private async Task<bool> CheckOffchain(string clientId)
         {
-            if (!await _clientSettingsRepository.IsOffchainClient(clientId))
-                throw new Exception("Offchain is not supported");
+            return await _clientSettingsRepository.IsOffchainClient(clientId);
         }
-
-
 
         /// <summary>
         /// Get offchain ChannelKey for transfer.  
         /// </summary>
         /// <returns></returns>
-        //[HttpPost("channelKey")] --reserved for version 2
-        //[SwaggerOperation("GetChannelKey")]
-        //[ProducesResponseType(typeof(OffchainEncryptedKeyRespModel), (int)HttpStatusCode.OK)]
-        private async Task<IActionResult> GetChannelKey([FromBody] OffchainGetChannelKeyRequest request)
+        [HttpGet("channel/key/{asset}/{clientId}")]
+        [SwaggerOperation("GetChannelKey")]
+        [ProducesResponseType(typeof(OffchainEncryptedKeyRespModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetChannelKey(string asset, string clientId)
         {
-            var data = await _offchainEncryptedKeysRepository.GetKey(request.ClientId, request.Asset);
+            var data = await _offchainEncryptedKeysRepository.GetKey(clientId, asset);
 
-            await LogInfo(new { request.Asset, request.ClientId }, ControllerContext, $"Channel key: {data?.Key}");
+            await LogInfo(new { asset, clientId }, ControllerContext, $"Channel key: {data?.Key}");
 
             return Ok(new OffchainEncryptedKeyRespModel
             {
@@ -81,57 +83,27 @@ namespace Lykke.blue.Service.ReferralLinks.Controllers
             });
         }
 
-
-        /// <summary>
-        /// Create offchain transfer to Lykke wallet
-        /// </summary>
-        /// <returns></returns>
-        //[HttpPost("transferToLykkeWallet")] --reserved for version 2
-        //[SwaggerOperation("TransferToLykkeWallet")]
-        //[ProducesResponseType(typeof(OffchainTradeRespModel), (int)HttpStatusCode.OK)]
-        //[ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.BadRequest)]
-        //[ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.NotFound)]
-        private async Task<IActionResult> TransferToLykkeWallet([FromBody] TransferToLykkeWallet model)
+        private async Task<IActionResult> CreateOffChainTransfer(string clientId, string assetId, decimal amount, string prevTempPrivateKey, string refLinkGroupId)
         {
-            var clientId = model.ClientId;
-            var refLink = await _referralLinksService.GetReferralLinkById(model.ReferralLinkId);
-
-            if (refLink == null)
-            {
-                return await LogAndReturnBadRequest(model, ControllerContext, "Ref link Id not found ot missing");
-            }
-
-            var asset = (await _assets.GetDictionaryAsync()).Values.FirstOrDefault(v => v.Id == refLink.Asset);
-
-            if (asset == null)
-            {
-                return await LogAndReturnBadRequest(model, ControllerContext, $"Specified asset id {refLink.Asset} in reflink id {refLink.Id} not found ");
-            }
-
-            await CheckOffchain(clientId);
-
-            if (await _srvKycForAsset.IsKycNeeded(clientId, asset.Id))
-            {
-                return await LogAndReturnBadRequest(model, ControllerContext, $"KYC needed for sender client id {model.ClientId} before sending asset {refLink.Asset}");
-            }
+            var request = new { clientId, assetId, amount, prevTempPrivateKey, refLinkGroupId };
 
             try
             {
-                var response = await _offchainService.CreateDirectTransfer(clientId, asset.Id, (decimal)refLink.Amount, model.PrevTempPrivateKey);
+                if (!await CheckOffchain(clientId))
+                {
+                    return await LogAndReturnBadRequest(request, ControllerContext, $"ClientId {clientId} is not an offchain client");
+                }
+
+                var response = await _offchainService.CreateDirectTransfer(clientId, assetId, amount, prevTempPrivateKey);
 
                 var exchangeOpResult = await _exchangeOperationsService.StartTransferAsync(
                     response.TransferId,
                     _settings.ReferralLinksService.LykkeReferralClientId, //send to shared lykke wallet where coins will be temporary stored until claimed by the recipient
                     clientId,
                     TransferType.Common.ToString()
-                    );
+                );
 
-                await LogInfo(new
-                {
-                    Method = "StartTransferAsync",
-                    response.TransferId,
-                    SourceClientId = clientId
-                }, ControllerContext, exchangeOpResult.ToJson());
+                await LogInfo(new { RefLinkGroupId = refLinkGroupId, Method = nameof(CreateOffChainTransfer), OffChainTransferId = response.TransferId, SourceClientId = clientId }, ControllerContext, exchangeOpResult.ToJson());
 
                 return Ok(new OffchainTradeRespModel
                 {
@@ -142,27 +114,54 @@ namespace Lykke.blue.Service.ReferralLinks.Controllers
             }
             catch (OffchainException ex)
             {
-                return await LogOffchainExceptionAndReturn(model, ControllerContext, ex);
+                return await LogOffchainExceptionAndReturn(request, ControllerContext, ex);
             }
             catch (Exception ex)
             {
-                return await LogAndReturnNotFound(model, ControllerContext, ex.Message);
+                return await LogAndReturnInternalServerError(request, ControllerContext, ex);
             }
         }
+        
 
+        /// <summary>
+        /// Create offchain transfer to Lykke wallet
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("transfer")]
+        [SwaggerOperation("TransferToLykkeHotWallet")]
+        [ProducesResponseType(typeof(OffchainTradeRespModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> TransferToLykkeWallet([FromBody] OffchainTransferToLykkeModel model)
+        {
+            var refLink = await _referralLinksService.Get(model.ReferralLinkId);
 
+            if (refLink == null)
+            {
+                return await LogAndReturnBadRequest(model, ControllerContext, "Ref link Id not found or missing");
+            }
 
+            var clientId = refLink.SenderClientId;
+            var refLinkAsset = refLink.Asset;
+
+            if (refLink.Amount <= 0 || !await _referralLinksService.HasEnoughBalance(clientId, refLinkAsset, refLink.Amount))
+            {
+                return await LogAndReturnBadRequest(model, ControllerContext, "Not enough balance.");
+            }
+
+            return await CreateOffChainTransfer(clientId, refLinkAsset, (decimal) refLink.Amount, model.PrevTempPrivateKey, model.ReferralLinkId);
+        }
 
         /// <summary>
         /// Process offchain channel
         /// </summary>
         /// <returns></returns>
-        //[HttpPost("processChannel")] --reserved for version 2
-        //[SwaggerOperation("ProcessChannel")]
-        //[ProducesResponseType(typeof(OffchainTradeRespModel), (int)HttpStatusCode.OK)]
-        //[ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.BadRequest)]
-        //[ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.NotFound)]
-        private async Task<IActionResult> ProcessChannel([FromBody] OffchainChannelProcessModel request)
+        [HttpPost("channel/process")]
+        [SwaggerOperation("ProcessChannel")]
+        [ProducesResponseType(typeof(OffchainTradeRespModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ProcessChannel([FromBody] OffchainChannelProcessModel request)
         {
             var clientId = request.ClientId;
 
@@ -193,38 +192,22 @@ namespace Lykke.blue.Service.ReferralLinks.Controllers
             }
             catch (Exception ex)
             {
-                return await LogAndReturnNotFound(request, ControllerContext, ex.Message);
+                return await LogAndReturnInternalServerError(request, ControllerContext, ex);
             }
-        }
-
-        private async void AttachSenderTransferToRefLink(IReferralLink refLink, string transferId)
-        {
-            var transfer = await _offchainTransferRepository.GetTransfer(transferId);
-
-            refLink.Amount = (double)transfer.Amount;
-            refLink.Asset = (await _assets.GetItemAsync(transfer.AssetId)).Id;
-            refLink.SenderOffchainTransferId = transferId;
-            refLink.State = ReferralLinkState.SentToLykkeSharedWallet.ToString();
-
-            await _referralLinksService.UpdateAsync(refLink);
-
-            await LogInfo(new { RefLink = refLink, TransferId = transferId }, ControllerContext, $"Transfer complete for ref link id {refLink.Id} with amount {transfer.Amount} and asset Id {refLink.Asset}. Offchain transfer Id {transferId} attached with ref link. ");
         }
 
         /// <summary>
         /// Process offchain channel
         /// </summary>
         /// <returns></returns>
-        //[HttpPost("finalizeRefLinkTransfer")] --reserved for version 2
-        //[SwaggerOperation("FinalizeRefLinkTransfer")]
-        //[ProducesResponseType(typeof(OffchainSuccessTradeRespModel), (int)HttpStatusCode.OK)]
-        //[ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.BadRequest)]
-        //[ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.NotFound)]
-        private async Task<IActionResult> Finalize([FromBody] OffchainFinalizeModel request)
+        [HttpPost("transfer/finalize")]
+        [SwaggerOperation("FinalizeRefLinkTransfer")]
+        [ProducesResponseType(typeof(OffchainTradeRespModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponseModel), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> Finalize([FromBody] OffchainFinalizeModel request)
         {
             var clientId = request.ClientId;
-
-            await CheckOffchain(clientId);
 
             if (string.IsNullOrEmpty(request.ClientRevokePubKey))
             {
@@ -241,7 +224,7 @@ namespace Lykke.blue.Service.ReferralLinks.Controllers
                 return await LogAndReturnBadRequest(request, ControllerContext, "TransferId must not be empty");
             }
 
-            var refLinkEntity = await _referralLinksService.GetReferralLinkById(request.RefLinkId);
+            var refLinkEntity = await _referralLinksService.Get(request.RefLinkId);
             if (refLinkEntity == null)
             {
                 return await LogAndReturnBadRequest(request, ControllerContext, "RefLinkId not found");
@@ -249,12 +232,19 @@ namespace Lykke.blue.Service.ReferralLinks.Controllers
 
             try
             {
+                if (!await CheckOffchain(clientId))
+                {
+                    return await LogAndReturnBadRequest(request, ControllerContext, $"ClientId {clientId} is not an offchain client");
+                }
+
                 var response = await _offchainService.Finalize(clientId, request.TransferId, request.ClientRevokePubKey, request.ClientRevokeEncryptedPrivateKey, request.SignedTransferTransaction);
 
                 if (response == null)
                 {
-                    return await LogAndReturnNotFound(request, ControllerContext, "OffchainService Finalize returned NULL. Can not finalize transfer.");
+                    return await LogAndReturnInternalServerError(request, ControllerContext, "OffchainService Finalize returned NULL. Can not finalize transfer.");
                 }
+
+                await LogInfo(request, ControllerContext, $"OffChain finalize result: {response.ToJson()}");
 
                 if (response.OperationResult == OffchainOperationResult.ClientCommitment)
                 {
@@ -262,12 +252,11 @@ namespace Lykke.blue.Service.ReferralLinks.Controllers
                 }
                 else
                 {
-                    await LogWarn(request, ControllerContext, $"_offchainService.Finalize returned unexpected result :  {response.ToJson()}");
+
+                    return await LogAndReturnInternalServerError(request, ControllerContext, $"OffChain finalize returned unexpected result :  {response.ToJson()}");
                 }
 
-                var offchainRequest =
-                    (await _offchainRequestRepository.GetRequestsForClient(clientId)).FirstOrDefault(
-                        x => x.TransferId == request.TransferId);
+                var offchainRequest = (await _offchainRequestRepository.GetRequestsForClient(clientId)).FirstOrDefault(x => x.TransferId == request.TransferId);
 
                 if (offchainRequest != null)
                 {
@@ -275,7 +264,7 @@ namespace Lykke.blue.Service.ReferralLinks.Controllers
                     await LogInfo(request, ControllerContext, $"Offchain request set to complete: {offchainRequest.ToJson()}");
                 }
 
-                return Ok(new OffchainSuccessTradeRespModel
+                return Ok(new OffchainTradeRespModel
                 {
                     TransferId = response.TransferId,
                     TransactionHex = response.TransactionHex,
@@ -288,8 +277,22 @@ namespace Lykke.blue.Service.ReferralLinks.Controllers
             }
             catch (Exception ex)
             {
-                return await LogAndReturnNotFound(request, ControllerContext, ex.Message);
+                return await LogAndReturnInternalServerError(request, ControllerContext, ex);
             }
+        }
+
+        private async void AttachSenderTransferToRefLink(IReferralLink refLink, string transferId)
+        {
+            var transfer = await _offchainTransferRepository.GetTransfer(transferId);
+
+            refLink.Amount = (double)transfer.Amount;
+            refLink.Asset = (await _assets.GetItemAsync(transfer.AssetId)).Id;
+            refLink.SenderOffchainTransferId = transferId;
+            refLink.State = ReferralLinkState.SentToLykkeSharedWallet.ToString();
+
+            await _referralLinksService.UpdateAsync(refLink);
+
+            await LogInfo(new { RefLink = refLink, TransferId = transferId }, ControllerContext, $"GiftCoin transfer to Hot Wallet completed for ref link id {refLink.Id} with amount {transfer.Amount} and asset Id {refLink.Asset}. Offchain transfer Id {transferId} attached to ref link. ");
         }
     }
 }

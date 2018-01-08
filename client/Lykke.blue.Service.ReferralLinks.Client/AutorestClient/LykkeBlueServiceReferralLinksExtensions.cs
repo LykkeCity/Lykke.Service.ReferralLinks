@@ -11,9 +11,9 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Extension methods for LykkeReferralLinksService.
+    /// Extension methods for LykkeBlueServiceReferralLinks.
     /// </summary>
-    public static partial class LykkeReferralLinksServiceExtensions
+    public static partial class LykkeBlueServiceReferralLinksExtensions
     {
             /// <summary>
             /// Checks service is alive
@@ -21,7 +21,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            public static object IsAlive(this ILykkeReferralLinksService operations)
+            public static object IsAlive(this ILykkeBlueServiceReferralLinks operations)
             {
                 return operations.IsAliveAsync().GetAwaiter().GetResult();
             }
@@ -35,7 +35,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> IsAliveAsync(this ILykkeReferralLinksService operations, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> IsAliveAsync(this ILykkeBlueServiceReferralLinks operations, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.IsAliveWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
                 {
@@ -53,7 +53,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// </param>
             /// <param name='clientId'>
             /// </param>
-            public static OffchainEncryptedKeyRespModel GetChannelKey(this ILykkeReferralLinksService operations, string asset, string clientId)
+            public static OffchainEncryptedKeyRespModel GetChannelKey(this ILykkeBlueServiceReferralLinks operations, string asset, string clientId)
             {
                 return operations.GetChannelKeyAsync(asset, clientId).GetAwaiter().GetResult();
             }
@@ -71,7 +71,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<OffchainEncryptedKeyRespModel> GetChannelKeyAsync(this ILykkeReferralLinksService operations, string asset, string clientId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<OffchainEncryptedKeyRespModel> GetChannelKeyAsync(this ILykkeBlueServiceReferralLinks operations, string asset, string clientId, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetChannelKeyWithHttpMessagesAsync(asset, clientId, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -87,7 +87,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// </param>
             /// <param name='model'>
             /// </param>
-            public static object TransferToLykkeHotWallet(this ILykkeReferralLinksService operations, TransferToLykkeWallet model = default(TransferToLykkeWallet))
+            public static object TransferToLykkeHotWallet(this ILykkeBlueServiceReferralLinks operations, OffchainTransferToLykkeModel model = default(OffchainTransferToLykkeModel))
             {
                 return operations.TransferToLykkeHotWalletAsync(model).GetAwaiter().GetResult();
             }
@@ -103,7 +103,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> TransferToLykkeHotWalletAsync(this ILykkeReferralLinksService operations, TransferToLykkeWallet model = default(TransferToLykkeWallet), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> TransferToLykkeHotWalletAsync(this ILykkeBlueServiceReferralLinks operations, OffchainTransferToLykkeModel model = default(OffchainTransferToLykkeModel), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.TransferToLykkeHotWalletWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -119,7 +119,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// </param>
             /// <param name='request'>
             /// </param>
-            public static object ProcessChannel(this ILykkeReferralLinksService operations, OffchainChannelProcessModel request = default(OffchainChannelProcessModel))
+            public static object ProcessChannel(this ILykkeBlueServiceReferralLinks operations, OffchainChannelProcessModel request = default(OffchainChannelProcessModel))
             {
                 return operations.ProcessChannelAsync(request).GetAwaiter().GetResult();
             }
@@ -135,7 +135,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> ProcessChannelAsync(this ILykkeReferralLinksService operations, OffchainChannelProcessModel request = default(OffchainChannelProcessModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> ProcessChannelAsync(this ILykkeBlueServiceReferralLinks operations, OffchainChannelProcessModel request = default(OffchainChannelProcessModel), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.ProcessChannelWithHttpMessagesAsync(request, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -151,7 +151,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// </param>
             /// <param name='request'>
             /// </param>
-            public static object FinalizeRefLinkTransfer(this ILykkeReferralLinksService operations, OffchainFinalizeModel request = default(OffchainFinalizeModel))
+            public static object FinalizeRefLinkTransfer(this ILykkeBlueServiceReferralLinks operations, OffchainFinalizeModel request = default(OffchainFinalizeModel))
             {
                 return operations.FinalizeRefLinkTransferAsync(request).GetAwaiter().GetResult();
             }
@@ -167,7 +167,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> FinalizeRefLinkTransferAsync(this ILykkeReferralLinksService operations, OffchainFinalizeModel request = default(OffchainFinalizeModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> FinalizeRefLinkTransferAsync(this ILykkeBlueServiceReferralLinks operations, OffchainFinalizeModel request = default(OffchainFinalizeModel), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.FinalizeRefLinkTransferWithHttpMessagesAsync(request, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -184,7 +184,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='id'>
             /// Id of a referral link we wanna get.
             /// </param>
-            public static object GetReferralLinkById(this ILykkeReferralLinksService operations, string id)
+            public static object GetReferralLinkById(this ILykkeBlueServiceReferralLinks operations, string id)
             {
                 return operations.GetReferralLinkByIdAsync(id).GetAwaiter().GetResult();
             }
@@ -201,9 +201,43 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetReferralLinkByIdAsync(this ILykkeReferralLinksService operations, string id, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> GetReferralLinkByIdAsync(this ILykkeBlueServiceReferralLinks operations, string id, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetReferralLinkByIdWithHttpMessagesAsync(id, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Get mass generated referral link by id.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='senderId'>
+            /// The Id of the referral link group
+            /// </param>
+            public static object GetGroupReferralLinkBySenderId(this ILykkeBlueServiceReferralLinks operations, string senderId)
+            {
+                return operations.GetGroupReferralLinkBySenderIdAsync(senderId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Get mass generated referral link by id.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='senderId'>
+            /// The Id of the referral link group
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<object> GetGroupReferralLinkBySenderIdAsync(this ILykkeBlueServiceReferralLinks operations, string senderId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetGroupReferralLinkBySenderIdWithHttpMessagesAsync(senderId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -218,7 +252,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='url'>
             /// Url of the referral link we want to get.
             /// </param>
-            public static object GetReferralLinkByUrl(this ILykkeReferralLinksService operations, string url)
+            public static object GetReferralLinkByUrl(this ILykkeBlueServiceReferralLinks operations, string url)
             {
                 return operations.GetReferralLinkByUrlAsync(url).GetAwaiter().GetResult();
             }
@@ -235,7 +269,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetReferralLinkByUrlAsync(this ILykkeReferralLinksService operations, string url, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> GetReferralLinkByUrlAsync(this ILykkeBlueServiceReferralLinks operations, string url, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetReferralLinkByUrlWithHttpMessagesAsync(url, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -252,7 +286,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='senderClientId'>
             /// Sender client id by which we want to get statistics.
             /// </param>
-            public static object GetReferralLinksStatisticsBySenderId(this ILykkeReferralLinksService operations, string senderClientId = default(string))
+            public static object GetReferralLinksStatisticsBySenderId(this ILykkeBlueServiceReferralLinks operations, string senderClientId = default(string))
             {
                 return operations.GetReferralLinksStatisticsBySenderIdAsync(senderClientId).GetAwaiter().GetResult();
             }
@@ -269,7 +303,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetReferralLinksStatisticsBySenderIdAsync(this ILykkeReferralLinksService operations, string senderClientId = default(string), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> GetReferralLinksStatisticsBySenderIdAsync(this ILykkeBlueServiceReferralLinks operations, string senderClientId = default(string), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.GetReferralLinksStatisticsBySenderIdWithHttpMessagesAsync(senderClientId, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -285,7 +319,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// </param>
             /// <param name='request'>
             /// </param>
-            public static object RequestGiftCoinsReferralLink(this ILykkeReferralLinksService operations, GiftCoinsReferralLinkRequest request = default(GiftCoinsReferralLinkRequest))
+            public static object RequestGiftCoinsReferralLink(this ILykkeBlueServiceReferralLinks operations, GiftCoinRequestGroup request = default(GiftCoinRequestGroup))
             {
                 return operations.RequestGiftCoinsReferralLinkAsync(request).GetAwaiter().GetResult();
             }
@@ -301,9 +335,41 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> RequestGiftCoinsReferralLinkAsync(this ILykkeReferralLinksService operations, GiftCoinsReferralLinkRequest request = default(GiftCoinsReferralLinkRequest), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> RequestGiftCoinsReferralLinkAsync(this ILykkeBlueServiceReferralLinks operations, GiftCoinRequestGroup request = default(GiftCoinRequestGroup), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.RequestGiftCoinsReferralLinkWithHttpMessagesAsync(request, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Generate Gift Coins referral link
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='request'>
+            /// </param>
+            public static object RequestGiftCoinsReferralLink1(this ILykkeBlueServiceReferralLinks operations, GiftCoinRequest request = default(GiftCoinRequest))
+            {
+                return operations.RequestGiftCoinsReferralLink1Async(request).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Generate Gift Coins referral link
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='request'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<object> RequestGiftCoinsReferralLink1Async(this ILykkeBlueServiceReferralLinks operations, GiftCoinRequest request = default(GiftCoinRequest), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.RequestGiftCoinsReferralLink1WithHttpMessagesAsync(request, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -317,7 +383,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// </param>
             /// <param name='request'>
             /// </param>
-            public static object RequestInvitationReferralLink(this ILykkeReferralLinksService operations, InvitationReferralLinkRequest request = default(InvitationReferralLinkRequest))
+            public static object RequestInvitationReferralLink(this ILykkeBlueServiceReferralLinks operations, InvitationReferralLinkRequest request = default(InvitationReferralLinkRequest))
             {
                 return operations.RequestInvitationReferralLinkAsync(request).GetAwaiter().GetResult();
             }
@@ -333,7 +399,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> RequestInvitationReferralLinkAsync(this ILykkeReferralLinksService operations, InvitationReferralLinkRequest request = default(InvitationReferralLinkRequest), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> RequestInvitationReferralLinkAsync(this ILykkeBlueServiceReferralLinks operations, InvitationReferralLinkRequest request = default(InvitationReferralLinkRequest), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.RequestInvitationReferralLinkWithHttpMessagesAsync(request, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -351,7 +417,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// </param>
             /// <param name='request'>
             /// </param>
-            public static object ClaimGiftCoins(this ILykkeReferralLinksService operations, string refLinkId, ClaimReferralLinkRequest request = default(ClaimReferralLinkRequest))
+            public static object ClaimGiftCoins(this ILykkeBlueServiceReferralLinks operations, string refLinkId, ClaimReferralLinkRequest request = default(ClaimReferralLinkRequest))
             {
                 return operations.ClaimGiftCoinsAsync(refLinkId, request).GetAwaiter().GetResult();
             }
@@ -369,7 +435,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> ClaimGiftCoinsAsync(this ILykkeReferralLinksService operations, string refLinkId, ClaimReferralLinkRequest request = default(ClaimReferralLinkRequest), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> ClaimGiftCoinsAsync(this ILykkeBlueServiceReferralLinks operations, string refLinkId, ClaimReferralLinkRequest request = default(ClaimReferralLinkRequest), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.ClaimGiftCoinsWithHttpMessagesAsync(refLinkId, request, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -387,7 +453,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// </param>
             /// <param name='request'>
             /// </param>
-            public static object ClaimInvitationLink(this ILykkeReferralLinksService operations, string refLinkId, ClaimReferralLinkRequest request = default(ClaimReferralLinkRequest))
+            public static object ClaimInvitationLink(this ILykkeBlueServiceReferralLinks operations, string refLinkId, ClaimReferralLinkRequest request = default(ClaimReferralLinkRequest))
             {
                 return operations.ClaimInvitationLinkAsync(refLinkId, request).GetAwaiter().GetResult();
             }
@@ -405,7 +471,7 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> ClaimInvitationLinkAsync(this ILykkeReferralLinksService operations, string refLinkId, ClaimReferralLinkRequest request = default(ClaimReferralLinkRequest), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> ClaimInvitationLinkAsync(this ILykkeBlueServiceReferralLinks operations, string refLinkId, ClaimReferralLinkRequest request = default(ClaimReferralLinkRequest), CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.ClaimInvitationLinkWithHttpMessagesAsync(refLinkId, request, null, cancellationToken).ConfigureAwait(false))
                 {

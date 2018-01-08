@@ -12,22 +12,25 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient.Models
     using Newtonsoft.Json;
     using System.Linq;
 
-    public partial class RequestInvitationResponse
+    public partial class OffchainGroupLinkTransferToLykkeModel
     {
         /// <summary>
-        /// Initializes a new instance of the RequestInvitationResponse class.
+        /// Initializes a new instance of the
+        /// OffchainGroupLinkTransferToLykkeModel class.
         /// </summary>
-        public RequestInvitationResponse()
+        public OffchainGroupLinkTransferToLykkeModel()
         {
           CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the RequestInvitationResponse class.
+        /// Initializes a new instance of the
+        /// OffchainGroupLinkTransferToLykkeModel class.
         /// </summary>
-        public RequestInvitationResponse(string refLinkId = default(string))
+        public OffchainGroupLinkTransferToLykkeModel(string groupReferralLinkId = default(string), string prevTempPrivateKey = default(string))
         {
-            RefLinkId = refLinkId;
+            GroupReferralLinkId = groupReferralLinkId;
+            PrevTempPrivateKey = prevTempPrivateKey;
             CustomInit();
         }
 
@@ -38,8 +41,13 @@ namespace Lykke.blue.Service.ReferralLinks.Client.AutorestClient.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "RefLinkId")]
-        public string RefLinkId { get; set; }
+        [JsonProperty(PropertyName = "GroupReferralLinkId")]
+        public string GroupReferralLinkId { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "PrevTempPrivateKey")]
+        public string PrevTempPrivateKey { get; set; }
 
     }
 }
